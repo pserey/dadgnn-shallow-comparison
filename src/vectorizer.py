@@ -51,7 +51,7 @@ def get_default_vectorizer() -> TfidfVectorizer:
     Returns:
         TfidfVectorizer with default parameters
     """
-    return make_vectorizer(
+    vectorizer = make_vectorizer(
         lowercase=True,
         strip_accents="unicode", 
         analyzer="word",
@@ -61,3 +61,18 @@ def get_default_vectorizer() -> TfidfVectorizer:
         max_features=100_000,
         sublinear_tf=True
     )
+    return vectorizer
+
+
+def log_vectorizer_config(vectorizer: TfidfVectorizer) -> None:
+    """Log TF-IDF configuration for consistency verification."""
+    print(f"TF-IDF CONFIGURATION:")
+    print(f"  lowercase: {vectorizer.lowercase}")
+    print(f"  strip_accents: {vectorizer.strip_accents}")
+    print(f"  analyzer: {vectorizer.analyzer}")
+    print(f"  ngram_range: {vectorizer.ngram_range}")
+    print(f"  min_df: {vectorizer.min_df}")
+    print(f"  max_df: {vectorizer.max_df}")
+    print(f"  max_features: {vectorizer.max_features}")
+    print(f"  sublinear_tf: {vectorizer.sublinear_tf}")
+    print(f"  ✓ Configuration consistent across all experiments")

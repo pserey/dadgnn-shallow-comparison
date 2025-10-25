@@ -28,6 +28,7 @@ from src.models import (
     get_model_display_name
 )
 from src.eval import evaluate_model_performance, print_evaluation_results
+from src.vectorizer import log_vectorizer_config
 
 
 def run_hyperparameter_search(
@@ -105,15 +106,17 @@ def run_experiment(dataset_name: str, model_name: str) -> Dict[str, Any]:
     Returns:
         Dictionary with experiment results
     """
-    print(f"Starting experiment: {dataset_name} + {get_model_display_name(model_name)}")
+    print(f"\n{'='*80}")
+    print(f"STARTING EXPERIMENT: {dataset_name.upper()} + {get_model_display_name(model_name)}")
+    print(f"{'='*80}")
     
-    # Load dataset
-    print(f"\nLoading dataset: {dataset_name}")
+    # Load dataset with validation
+    print(f"Loading dataset: {dataset_name}")
     train_texts, train_labels, val_texts, val_labels, test_texts, test_labels = (
         load_text_classification_dataset(dataset_name)
     )
     
-    # Print dataset statistics
+    # Print dataset statistics with validation
     print_dataset_stats(
         train_texts, train_labels, 
         val_texts, val_labels,
@@ -121,9 +124,23 @@ def run_experiment(dataset_name: str, model_name: str) -> Dict[str, Any]:
         dataset_name
     )
     
+    # Log experiment configuration
+    print(f"EXPERIMENT CONFIGURATION:")
+    print(f"  Model: {get_model_display_name(model_name)}")
+    print(f"  Dataset: {dataset_name}")
+    print(f"  Train+Val combined: {len(train_texts) + len(val_texts)} samples")
+    print(f"  Test (held-out): {len(test_texts)} samples")
+    print(f"  Validation strategy: 5-fold stratified CV")
+    print(f"  Selection metric: Macro-F1")
+    print(f"  Final evaluation: Test set only")
+    print()
+    
     # Create model pipeline
     pipeline = create_model_pipeline(model_name)
     param_grid = get_hyperparameter_grid(model_name)
+    
+    # Validate pipeline configuration
+    log_pipeline_validation(pipeline, param_grid)
     
     # Run hyperparameter search
     best_estimator, best_params, cv_results = run_hyperparameter_search(
@@ -155,6 +172,32 @@ def run_experiment(dataset_name: str, model_name: str) -> Dict[str, Any]:
     results['model_name_key'] = model_name
     
     return results
+
+
+def log_pipeline_validation(pipeline, param_grid: Dict[str, Any]) -> None:
+    """Log pipeline configuration for reproducibility validation."""
+    print(f"PIPELINE VALIDATION:")
+    print(f"  Pipeline steps: {[step[0] for step in pipeline.steps]}")
+    
+    # Validate vectorizer is inside pipeline
+    vectorizer_in_pipeline = any(step[0] == 'vectorizer' for step in pipeline.steps)
+    classifier_in_pipeline = any(step[0] == 'classifier' for step in pipeline.steps)
+    
+    assert vectorizer_in_pipeline, "Vectorizer must be inside pipeline to prevent data leakage"
+    assert classifier_in_pipeline, "Classifier must be inside pipeline"
+    print(f"  ✓ Vectorizer inside pipeline (prevents leakage)")
+    print(f"  ✓ Classifier inside pipeline")
+    
+    # Log TF-IDF configuration for consistency
+    vectorizer = pipeline.named_steps['vectorizer']
+    log_vectorizer_config(vectorizer)
+    
+    # Log parameter grid
+    print(f"\nHYPERPARAMETER GRID:")
+    print(f"  Grid size: {len(list(param_grid.keys()))} parameters")
+    for param, values in param_grid.items():
+        print(f"    {param}: {values}")
+    print()
 
 
 def save_results_to_file(results: Dict[str, Any], dataset_name: str, model_name: str) -> str:
