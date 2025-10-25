@@ -22,11 +22,12 @@ DATASET_CONFIGS = {
         "has_validation": False,
     },
     "trec": {
-        "name": "uciml/trec",  # Will use special loading with trust_remote_code
+        "name": "lukasgarbas/trec",  # Real TREC dataset in Parquet format
         "text_column": "text", 
         "label_column": "coarse_label",
         "num_classes": 6,
-        "has_validation": False,
+        "has_validation": True,  # Real dataset has validation split
+        "label_mapping": {"ABBR": 0, "DESC": 1, "ENTY": 2, "HUM": 3, "LOC": 4, "NUM": 5},  # Convert string to numeric
     },
     "rotten_tomatoes": {
         "name": "rotten_tomatoes",
@@ -40,82 +41,26 @@ DATASET_CONFIGS = {
 
 def _load_trec_dataset():
     """
-    Load TREC dataset using the new Hugging Face format.
+    Load real TREC dataset - no synthetic fallbacks allowed.
     Standard TREC: 5,500 train / 500 test with 6 coarse classes.
     """
+    from datasets import load_dataset
+    
     try:
-        # Try the new community dataset format first
-        from datasets import load_dataset
-        dataset = load_dataset("CogComp/trec")
+        # Try the Parquet-based TREC dataset (recommended format)
+        print("Loading real TREC dataset from lukasgarbas/trec...")
+        dataset = load_dataset("lukasgarbas/trec")
+        print("✓ Successfully loaded real TREC dataset!")
         return dataset
     except Exception as e1:
-        try:
-            # Alternative: try different repository formats
-            dataset = load_dataset("trec", revision="main")
-            return dataset
-        except Exception as e2:
-            try:
-                # Alternative: try the community-maintained version
-                dataset = load_dataset("SetFit/trec")
-                return dataset
-            except Exception as e3:
-                # Fallback: Create a more realistic TREC dataset with proper splits
-                # Based on TREC question types: ABBR, ENTY, DESC, HUM, LOC, NUM
-                import random
-                random.seed(42)  # For reproducibility
-                
-                # Real TREC-style questions with proper class distribution
-                question_templates = {
-                    0: ["What does {} stand for?", "What is the abbreviation for {}?", "What does the acronym {} mean?"],  # ABBR
-                    1: ["What is a {}?", "What kind of {} is this?", "What type of {} do you need?"],  # ENTY
-                    2: ["How do you {}?", "Why does {} happen?", "What causes {}?"],  # DESC
-                    3: ["Who was {}?", "Who invented {}?", "Who is the author of {}?"],  # HUM
-                    4: ["Where is {} located?", "Where can you find {}?", "Where did {} happen?"],  # LOC
-                    5: ["How many {} are there?", "How much does {} cost?", "What is the population of {}?"],  # NUM
-                }
-                
-                terms = ["France", "computer", "photosynthesis", "Einstein", "Paris", "people", "money", 
-                        "gravity", "Shakespeare", "Tokyo", "cars", "democracy", "Newton", "London", "atoms"]
-                
-                def generate_questions(n_samples, is_test=False):
-                    texts, labels = [], []
-                    samples_per_class = n_samples // 6
-                    remainder = n_samples % 6
-                    
-                    for class_id in range(6):
-                        n_for_class = samples_per_class + (1 if class_id < remainder else 0)
-                        templates = question_templates[class_id]
-                        
-                        for i in range(n_for_class):
-                            template = random.choice(templates)
-                            term = random.choice(terms)
-                            question = template.format(term)
-                            texts.append(question)
-                            labels.append(class_id)
-                    
-                    # Shuffle to avoid class ordering
-                    combined = list(zip(texts, labels))
-                    random.shuffle(combined)
-                    texts, labels = zip(*combined)
-                    
-                    return {"text": list(texts), "coarse_label": list(labels)}
-                
-                # Generate standard TREC splits: 5,500 train / 500 test
-                train_data = generate_questions(5500)
-                test_data = generate_questions(500, is_test=True)
-                
-                # Create dataset-like object
-                class TrecDataset:
-                    def __init__(self):
-                        self.data = {
-                            "train": train_data,
-                            "test": test_data
-                        }
-                        
-                    def __getitem__(self, split):
-                        return self.data[split]
-                
-                return TrecDataset()
+        print(f"Failed to load lukasgarbas/trec: {e1}")
+        
+        # If TREC fails, this is an error that should be fixed
+        raise RuntimeError(
+            f"Failed to load real TREC dataset. Error: {e1}\n"
+            f"TREC dataset loading failed. This needs to be fixed - no synthetic fallbacks allowed.\n"
+            f"Options: 1) Fix TREC loading, 2) Replace with SST-2 or another DADGNN paper dataset"
+        )
 
 
 def load_text_classification_dataset(
@@ -141,8 +86,8 @@ def load_text_classification_dataset(
     config = DATASET_CONFIGS[dataset_name]
     
     # Load dataset from Hugging Face
-    if config["name"] == "uciml/trec":
-        # Special case for TREC: load from alternative source
+    if config["name"] == "lukasgarbas/trec":
+        # Special case for TREC: load real dataset
         dataset = _load_trec_dataset()
     else:
         dataset = load_dataset(config["name"])
@@ -156,10 +101,21 @@ def load_text_classification_dataset(
     test_texts = dataset["test"][text_col]
     test_labels = dataset["test"][label_col]
     
+    # Convert string labels to numeric if needed (for TREC)
+    if "label_mapping" in config:
+        label_map = config["label_mapping"]
+        train_labels = [label_map[label] for label in train_labels]
+        test_labels = [label_map[label] for label in test_labels]
+    
     # Handle validation split
     if config["has_validation"] and "validation" in dataset:
         val_texts = dataset["validation"][text_col]
         val_labels = dataset["validation"][label_col]
+        
+        # Convert string labels to numeric if needed (for TREC validation)
+        if "label_mapping" in config:
+            label_map = config["label_mapping"]
+            val_labels = [label_map[label] for label in val_labels]
     else:
         # Create validation split from training data
         train_texts, val_texts, train_labels, val_labels = train_test_split(
@@ -196,8 +152,8 @@ def validate_dataset_splits(dataset_name: str, train_texts: List[str], test_text
         assert len(set(train_labels + test_labels)) == 4, f"AG News should have 4 classes, got {len(set(train_labels + test_labels))}"
         
     elif dataset_name == "trec":
-        # TREC: should be 5,500 train / 500 test with 6 classes  
-        assert len(train_texts) >= 4950, f"TREC train should be ~5500, got {len(train_texts)} (allowing for val split)"
+        # TREC: Real dataset is ~4907 train / 500 test with 6 classes  
+        assert len(train_texts) >= 4500, f"TREC train should be ~4900, got {len(train_texts)}"
         assert len(test_texts) == 500, f"TREC test should be 500, got {len(test_texts)}"
         n_classes = len(set(train_labels + test_labels))
         assert n_classes == 6, f"TREC should have 6 coarse classes, got {n_classes}"
