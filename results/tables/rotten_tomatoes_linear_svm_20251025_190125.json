@@ -1,0 +1,28 @@
+{
+  "dataset": "rotten_tomatoes",
+  "model": "TF-IDF + Linear SVM",
+  "accuracy": 0.797373358348968,
+  "accuracy_ci_lower": 0.773921200750469,
+  "accuracy_ci_upper": 0.8198874296435272,
+  "macro_f1": 0.797302008176373,
+  "confusion_matrix": [
+    [
+      435,
+      98
+    ],
+    [
+      118,
+      415
+    ]
+  ],
+  "n_samples": 1066,
+  "n_classes": 2,
+  "best_params": {
+    "classifier__C": 0.5,
+    "classifier__class_weight": null,
+    "classifier__loss": "squared_hinge"
+  },
+  "model_name_key": "linear_svm",
+  "experiment_timestamp": "20251025_190125",
+  "experiment_date": "2025-10-25T19:01:25.451332"
+}

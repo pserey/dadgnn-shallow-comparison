@@ -1,0 +1,42 @@
+{
+  "dataset": "ag_news",
+  "model": "TF-IDF + Multinomial Naive Bayes",
+  "accuracy": 0.9055263157894737,
+  "accuracy_ci_lower": 0.8986842105263158,
+  "accuracy_ci_upper": 0.9122401315789473,
+  "macro_f1": 0.905239428876066,
+  "confusion_matrix": [
+    [
+      1697,
+      62,
+      90,
+      51
+    ],
+    [
+      23,
+      1860,
+      7,
+      10
+    ],
+    [
+      66,
+      18,
+      1622,
+      194
+    ],
+    [
+      59,
+      18,
+      120,
+      1703
+    ]
+  ],
+  "n_samples": 7600,
+  "n_classes": 4,
+  "best_params": {
+    "classifier__alpha": 0.1
+  },
+  "model_name_key": "multinomial_nb",
+  "experiment_timestamp": "20251025_190041",
+  "experiment_date": "2025-10-25T19:00:41.705303"
+}

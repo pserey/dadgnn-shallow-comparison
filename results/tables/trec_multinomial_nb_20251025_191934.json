@@ -1,0 +1,66 @@
+{
+  "dataset": "trec",
+  "model": "TF-IDF + Multinomial Naive Bayes",
+  "accuracy": 0.852,
+  "accuracy_ci_lower": 0.822,
+  "accuracy_ci_upper": 0.884,
+  "macro_f1": 0.8486666003544859,
+  "confusion_matrix": [
+    [
+      7,
+      2,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      129,
+      7,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      14,
+      61,
+      10,
+      7,
+      2
+    ],
+    [
+      0,
+      0,
+      2,
+      60,
+      2,
+      1
+    ],
+    [
+      0,
+      3,
+      2,
+      3,
+      73,
+      0
+    ],
+    [
+      0,
+      6,
+      1,
+      5,
+      5,
+      96
+    ]
+  ],
+  "n_samples": 500,
+  "n_classes": 6,
+  "best_params": {
+    "classifier__alpha": 0.1
+  },
+  "model_name_key": "multinomial_nb",
+  "experiment_timestamp": "20251025_191934",
+  "experiment_date": "2025-10-25T19:19:34.396339"
+}

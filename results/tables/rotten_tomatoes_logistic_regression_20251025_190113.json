@@ -1,0 +1,30 @@
+{
+  "dataset": "rotten_tomatoes",
+  "model": "TF-IDF + Logistic Regression",
+  "accuracy": 0.7936210131332082,
+  "accuracy_ci_lower": 0.7701688555347092,
+  "accuracy_ci_upper": 0.8170966228893057,
+  "macro_f1": 0.7935483416611206,
+  "confusion_matrix": [
+    [
+      433,
+      100
+    ],
+    [
+      120,
+      413
+    ]
+  ],
+  "n_samples": 1066,
+  "n_classes": 2,
+  "best_params": {
+    "classifier__C": 4,
+    "classifier__class_weight": "balanced",
+    "classifier__max_iter": 2000,
+    "classifier__penalty": "l2",
+    "classifier__solver": "lbfgs"
+  },
+  "model_name_key": "logistic_regression",
+  "experiment_timestamp": "20251025_190113",
+  "experiment_date": "2025-10-25T19:01:13.033088"
+}

@@ -1,0 +1,44 @@
+{
+  "dataset": "ag_news",
+  "model": "TF-IDF + Linear SVM",
+  "accuracy": 0.9275,
+  "accuracy_ci_lower": 0.921578947368421,
+  "accuracy_ci_upper": 0.9332894736842106,
+  "macro_f1": 0.927339193074239,
+  "confusion_matrix": [
+    [
+      1729,
+      56,
+      70,
+      45
+    ],
+    [
+      9,
+      1873,
+      13,
+      5
+    ],
+    [
+      46,
+      15,
+      1707,
+      132
+    ],
+    [
+      46,
+      14,
+      100,
+      1740
+    ]
+  ],
+  "n_samples": 7600,
+  "n_classes": 4,
+  "best_params": {
+    "classifier__C": 0.5,
+    "classifier__class_weight": null,
+    "classifier__loss": "squared_hinge"
+  },
+  "model_name_key": "linear_svm",
+  "experiment_timestamp": "20251025_185859",
+  "experiment_date": "2025-10-25T18:58:59.473052"
+}

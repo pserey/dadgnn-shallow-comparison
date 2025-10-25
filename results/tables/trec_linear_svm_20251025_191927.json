@@ -1,0 +1,68 @@
+{
+  "dataset": "trec",
+  "model": "TF-IDF + Linear SVM",
+  "accuracy": 0.894,
+  "accuracy_ci_lower": 0.868,
+  "accuracy_ci_upper": 0.92,
+  "macro_f1": 0.8821870677154616,
+  "confusion_matrix": [
+    [
+      7,
+      2,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      133,
+      4,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      10,
+      73,
+      4,
+      7,
+      0
+    ],
+    [
+      0,
+      0,
+      3,
+      61,
+      1,
+      0
+    ],
+    [
+      0,
+      3,
+      5,
+      0,
+      73,
+      0
+    ],
+    [
+      0,
+      7,
+      2,
+      1,
+      3,
+      100
+    ]
+  ],
+  "n_samples": 500,
+  "n_classes": 6,
+  "best_params": {
+    "classifier__C": 0.5,
+    "classifier__class_weight": "balanced",
+    "classifier__loss": "squared_hinge"
+  },
+  "model_name_key": "linear_svm",
+  "experiment_timestamp": "20251025_191927",
+  "experiment_date": "2025-10-25T19:19:27.263490"
+}

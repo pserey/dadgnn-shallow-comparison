@@ -1,0 +1,46 @@
+{
+  "dataset": "ag_news",
+  "model": "TF-IDF + Logistic Regression",
+  "accuracy": 0.9234210526315789,
+  "accuracy_ci_lower": 0.9176315789473685,
+  "accuracy_ci_upper": 0.9292171052631579,
+  "macro_f1": 0.9233233571471214,
+  "confusion_matrix": [
+    [
+      1732,
+      50,
+      71,
+      47
+    ],
+    [
+      22,
+      1858,
+      15,
+      5
+    ],
+    [
+      53,
+      13,
+      1697,
+      137
+    ],
+    [
+      44,
+      15,
+      110,
+      1731
+    ]
+  ],
+  "n_samples": 7600,
+  "n_classes": 4,
+  "best_params": {
+    "classifier__C": 4,
+    "classifier__class_weight": null,
+    "classifier__max_iter": 2000,
+    "classifier__penalty": "l2",
+    "classifier__solver": "lbfgs"
+  },
+  "model_name_key": "logistic_regression",
+  "experiment_timestamp": "20251025_185550",
+  "experiment_date": "2025-10-25T18:55:50.249469"
+}

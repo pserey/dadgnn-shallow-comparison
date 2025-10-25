@@ -1,0 +1,26 @@
+{
+  "dataset": "rotten_tomatoes",
+  "model": "TF-IDF + Multinomial Naive Bayes",
+  "accuracy": 0.8048780487804879,
+  "accuracy_ci_lower": 0.7814258911819888,
+  "accuracy_ci_upper": 0.8274155722326454,
+  "macro_f1": 0.8046297862741781,
+  "confusion_matrix": [
+    [
+      448,
+      85
+    ],
+    [
+      123,
+      410
+    ]
+  ],
+  "n_samples": 1066,
+  "n_classes": 2,
+  "best_params": {
+    "classifier__alpha": 0.5
+  },
+  "model_name_key": "multinomial_nb",
+  "experiment_timestamp": "20251025_190135",
+  "experiment_date": "2025-10-25T19:01:35.952703"
+}
