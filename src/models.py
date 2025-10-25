@@ -26,6 +26,7 @@ HYPERPARAMETER_GRIDS = {
         "classifier__C": [0.5, 1, 2, 4],
         "classifier__class_weight": [None, "balanced"],
         "classifier__penalty": ["l2"],
+        "classifier__solver": ["lbfgs"],
         "classifier__max_iter": [2000],
     },
     "linear_svm": {
@@ -57,7 +58,7 @@ def create_model_pipeline(model_name: str) -> Pipeline:
     
     # Set some reasonable defaults for reproducibility
     if model_name == "logistic_regression":
-        classifier = model_class(random_state=42, solver='lbfgs', max_iter=2000)
+        classifier = model_class(random_state=42)
     elif model_name == "linear_svm": 
         classifier = model_class(random_state=42)
     else:  # multinomial_nb

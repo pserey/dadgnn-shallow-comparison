@@ -7,7 +7,11 @@ Usage:
 
 import argparse
 import time
+import json
+import os
+from datetime import datetime
 from typing import Dict, Any
+import numpy as np
 
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.base import clone
@@ -153,6 +157,48 @@ def run_experiment(dataset_name: str, model_name: str) -> Dict[str, Any]:
     return results
 
 
+def save_results_to_file(results: Dict[str, Any], dataset_name: str, model_name: str) -> str:
+    """
+    Save experiment results to JSON file in results/ directory.
+    
+    Args:
+        results: Dictionary with experiment results
+        dataset_name: Name of dataset
+        model_name: Model name key (e.g., 'logistic_regression')
+        
+    Returns:
+        Path to saved file
+    """
+    # Create results directory if it doesn't exist
+    os.makedirs("results/tables", exist_ok=True)
+    
+    # Create filename with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"results/tables/{dataset_name}_{model_name}_{timestamp}.json"
+    
+    # Prepare results for JSON serialization (convert numpy arrays)
+    serializable_results = {}
+    for key, value in results.items():
+        if isinstance(value, np.ndarray):
+            serializable_results[key] = value.tolist()
+        elif isinstance(value, np.integer):
+            serializable_results[key] = int(value)
+        elif isinstance(value, np.floating):
+            serializable_results[key] = float(value)
+        else:
+            serializable_results[key] = value
+    
+    # Add metadata
+    serializable_results['experiment_timestamp'] = timestamp
+    serializable_results['experiment_date'] = datetime.now().isoformat()
+    
+    # Save to file
+    with open(filename, 'w') as f:
+        json.dump(serializable_results, f, indent=2)
+    
+    return filename
+
+
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -191,6 +237,10 @@ def main():
         print("BEST HYPERPARAMETERS:")
         for param, value in results['best_params'].items():
             print(f"  {param}: {value}")
+        
+        # Save results to file
+        results_file = save_results_to_file(results, args.dataset, args.model)
+        print(f"\nResults saved to: {results_file}")
         
         print(f"\nExperiment completed successfully!")
         
